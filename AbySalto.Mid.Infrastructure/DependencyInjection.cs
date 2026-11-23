@@ -1,7 +1,9 @@
 ﻿using System.Text;
 using AbySalto.Mid.Application.Auth;
 using AbySalto.Mid.Application.Common.Interfaces;
+using AbySalto.Mid.Application.Products;
 using AbySalto.Mid.Infrastructure.Authentication;
+using AbySalto.Mid.Infrastructure.ExternalServices.DummyJson;
 using AbySalto.Mid.Infrastructure.Identity;
 using AbySalto.Mid.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,7 +22,24 @@ namespace AbySalto.Mid.Infrastructure
             services
                 .AddDatabase(configuration)
                 .AddIdentityAndJwt(configuration)
+                .AddExternalServices(configuration)
                 .AddServices();
+
+            return services;
+        }
+
+        private static IServiceCollection AddExternalServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            var section = configuration.GetSection(DummyJsonOptions.SectionName);
+            services.Configure<DummyJsonOptions>(section);
+            var options = section.Get<DummyJsonOptions>() ?? new DummyJsonOptions();
+
+            services.AddMemoryCache();
+            services.AddHttpClient<IProductCatalog, DummyJsonProductCatalog>(client =>
+            {
+                client.BaseAddress = new Uri(options.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(15);
+            });
 
             return services;
         }
