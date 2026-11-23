@@ -1,6 +1,7 @@
 
 using AbySalto.Mid.Application;
 using AbySalto.Mid.Infrastructure;
+using AbySalto.Mid.Middleware;
 
 namespace AbySalto.Mid
 {
@@ -11,14 +12,13 @@ namespace AbySalto.Mid
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services
-                .AddPresentation()
+                .AddPresentation(builder.Configuration)
                 .AddApplication()
                 .AddInfrastructure(builder.Configuration);
 
-            builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
-
             var app = builder.Build();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             if (app.Environment.IsDevelopment())
             {
@@ -32,6 +32,8 @@ namespace AbySalto.Mid
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors(DependencyInjection.CorsPolicy);
 
             app.UseAuthorization();
 
