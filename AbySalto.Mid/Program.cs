@@ -35,6 +35,7 @@ namespace AbySalto.Mid
 
             app.UseCors(DependencyInjection.CorsPolicy);
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
