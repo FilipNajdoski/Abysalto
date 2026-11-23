@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AbySalto.Mid.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AbySalto.Mid.Infrastructure
@@ -7,6 +9,10 @@ namespace AbySalto.Mid.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            services
+                .AddDatabase(configuration)
+                .AddServices();
+
             return services;
         }
 
@@ -17,6 +23,11 @@ namespace AbySalto.Mid.Infrastructure
 
         private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
+
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+
             return services;
         }
     }
