@@ -1,4 +1,5 @@
 using AbySalto.Mid.Application.Common.Exceptions;
+using AbySalto.Mid.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AbySalto.Mid.Middleware
@@ -32,6 +33,7 @@ namespace AbySalto.Mid.Middleware
             {
                 NotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
                 ValidationException => (StatusCodes.Status400BadRequest, "Validation Failed"),
+                DomainException => (StatusCodes.Status400BadRequest, "Business Rule Violation"),
                 ConflictException => (StatusCodes.Status409Conflict, "Conflict"),
                 UnauthorizedException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
                 _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")

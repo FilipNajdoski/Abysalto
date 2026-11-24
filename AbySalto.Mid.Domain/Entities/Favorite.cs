@@ -1,6 +1,8 @@
+using AbySalto.Mid.Domain.Common;
+
 namespace AbySalto.Mid.Domain.Entities
 {
-    public class Favorite
+    public class Favorite : IAggregateRoot
     {
         public Guid Id { get; private set; }
         public Guid UserId { get; private set; }
@@ -15,7 +17,7 @@ namespace AbySalto.Mid.Domain.Entities
         {
             if (productId <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(productId), "Product id must be positive.");
+                throw new DomainException("Product id must be positive.");
             }
 
             Id = Guid.NewGuid();

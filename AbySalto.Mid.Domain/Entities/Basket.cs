@@ -1,6 +1,8 @@
+using AbySalto.Mid.Domain.Common;
+
 namespace AbySalto.Mid.Domain.Entities
 {
-    public class Basket
+    public class Basket : IAggregateRoot
     {
         private readonly List<BasketItem> _items = [];
 
@@ -25,9 +27,21 @@ namespace AbySalto.Mid.Domain.Entities
         public int GetQuantity(int productId) =>
             _items.FirstOrDefault(i => i.ProductId == productId)?.Quantity ?? 0;
 
-        public BasketItem AddItem(int productId, int quantity)
+        public BasketItem AddItem(int productId, int quantity, int availableStock)
         {
+            if (quantity <= 0)
+            {
+                throw new DomainException("Quantity must be greater than zero.");
+            }
+
             var item = _items.FirstOrDefault(i => i.ProductId == productId);
+            var requestedTotal = (item?.Quantity ?? 0) + quantity;
+            if (requestedTotal > availableStock)
+            {
+                throw new DomainException(
+                    $"Requested total {requestedTotal} of product {productId} exceeds available stock {availableStock}.");
+            }
+
             if (item is null)
             {
                 item = new BasketItem(Id, productId, quantity);

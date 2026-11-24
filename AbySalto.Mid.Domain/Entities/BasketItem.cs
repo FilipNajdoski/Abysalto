@@ -1,3 +1,5 @@
+using AbySalto.Mid.Domain.Common;
+
 namespace AbySalto.Mid.Domain.Entities
 {
     public class BasketItem
@@ -16,7 +18,7 @@ namespace AbySalto.Mid.Domain.Entities
         {
             if (productId <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(productId), "Product id must be positive.");
+                throw new DomainException("Product id must be positive.");
             }
 
             EnsurePositive(quantity);
@@ -38,7 +40,7 @@ namespace AbySalto.Mid.Domain.Entities
         {
             if (quantity <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity must be positive.");
+                throw new DomainException("Quantity must be greater than zero.");
             }
         }
     }

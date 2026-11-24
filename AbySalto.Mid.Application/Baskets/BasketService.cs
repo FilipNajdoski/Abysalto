@@ -38,18 +38,7 @@ namespace AbySalto.Mid.Application.Baskets
             var isNew = basket is null;
             basket ??= new Basket(userId);
 
-            var requestedTotal = basket.GetQuantity(product.Id) + request.Quantity;
-            if (requestedTotal > product.Stock)
-            {
-                throw new ValidationException(
-                    $"Only {product.Stock} unit(s) of product {product.Id} are in stock.",
-                    new Dictionary<string, string[]>
-                    {
-                        ["quantity"] = [$"Requested total {requestedTotal} exceeds available stock {product.Stock}."]
-                    });
-            }
-
-            basket.AddItem(product.Id, request.Quantity);
+            basket.AddItem(product.Id, request.Quantity, product.Stock);
 
             if (isNew)
             {
