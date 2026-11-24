@@ -1,4 +1,5 @@
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useShop } from '../context/ShopContext.jsx';
 import CartDrawer from './CartDrawer.jsx';
@@ -9,6 +10,12 @@ export default function Layout() {
   const { user, isAuthenticated, logout } = useAuth();
   const { basket, openCart } = useShop();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+	setMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
 	logout();
@@ -21,18 +28,20 @@ export default function Layout() {
 	  <header className="navbar">
 		<Link to="/" className="brand">AbySalto</Link>
 		<nav className="nav-links">
-		  <NavLink to="/" end>Shop</NavLink>
-		  {isAuthenticated ? (
-			<>
-			  <NavLink to="/profile">Hi, {user.firstName}</NavLink>
-			  <button type="button" className="link-button" onClick={handleLogout}>Log out</button>
-			</>
-		  ) : (
-			<>
-			  <NavLink to="/login">Log in</NavLink>
-			  <NavLink to="/register">Create account</NavLink>
-			</>
-		  )}
+		  <div className={`nav-menu${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(false)}>
+			<NavLink to="/" end>Shop</NavLink>
+			{isAuthenticated ? (
+			  <>
+				<NavLink to="/profile">Hi, {user.firstName}</NavLink>
+				<button type="button" className="link-button" onClick={handleLogout}>Log out</button>
+			  </>
+			) : (
+			  <>
+				<NavLink to="/login">Log in</NavLink>
+				<NavLink to="/register">Create account</NavLink>
+			  </>
+			)}
+		  </div>
 		  {isAuthenticated && (
 			<NavLink to="/favorites" className="icon-link" aria-label="Favorites">
 			  <HeartIcon />
@@ -46,6 +55,15 @@ export default function Layout() {
 		  >
 			<BagIcon />
 			{basket.totalQuantity > 0 && <span className="cart-count">{basket.totalQuantity}</span>}
+		  </button>
+		  <button
+			type="button"
+			className="icon-link menu-toggle"
+			onClick={() => setMenuOpen((open) => !open)}
+			aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+			aria-expanded={menuOpen}
+		  >
+			<span className={`burger${menuOpen ? ' open' : ''}`} aria-hidden="true"><span /></span>
 		  </button>
 		</nav>
 	  </header>
