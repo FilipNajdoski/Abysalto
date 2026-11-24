@@ -267,6 +267,16 @@ select:focus {
 .hero p { margin: 0; }
 
 /* Category filter */
+.button.in-cart {
+  background: #f1f8f5;
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.button.in-cart:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
 .category-filter { margin-bottom: 1.25rem; }
 
 .category-list {

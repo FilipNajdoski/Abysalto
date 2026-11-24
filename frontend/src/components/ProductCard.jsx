@@ -4,8 +4,9 @@ import { formatPrice, originalPrice } from '../utils/format.js';
 import { HeartIcon, StarRating } from './Icons.jsx';
 
 export default function ProductCard({ product }) {
-  const { isFavorite, toggleFavorite, addToCart } = useShop();
+  const { isFavorite, toggleFavorite, addToCart, basket, openCart } = useShop();
   const favorite = isFavorite(product.id);
+  const inCartQuantity = basket.items.find((i) => i.productId === product.id)?.quantity ?? 0;
   const compareAt = originalPrice(product.price, product.discountPercentage);
   const outOfStock = product.stock <= 0;
 
@@ -33,14 +34,20 @@ export default function ProductCard({ product }) {
           <span className="price">{formatPrice(product.price)}</span>
           {compareAt && <span className="compare">{formatPrice(compareAt)}</span>}
         </div>
-        <button
-          type="button"
-          className="button secondary full"
-          disabled={outOfStock}
-          onClick={() => addToCart(product.id, 1)}
-        >
-          {outOfStock ? 'Sold out' : 'Add to cart'}
-        </button>
+        {inCartQuantity > 0 ? (
+          <button type="button" className="button in-cart full" onClick={openCart}>
+            ✓ In cart ({inCartQuantity}) · View
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="button secondary full"
+            disabled={outOfStock}
+            onClick={() => addToCart(product.id, 1)}
+          >
+            {outOfStock ? 'Sold out' : 'Add to cart'}
+          </button>
+        )}
       </div>
     </article>
   );
