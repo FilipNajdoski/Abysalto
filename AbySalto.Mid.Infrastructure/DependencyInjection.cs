@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using AbySalto.Mid.Application.Auth;
+using AbySalto.Mid.Application.Baskets;
 using AbySalto.Mid.Application.Common.Interfaces;
 using AbySalto.Mid.Application.Favorites;
 using AbySalto.Mid.Application.Products;
@@ -53,6 +54,7 @@ namespace AbySalto.Mid.Infrastructure
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+            services.AddScoped<IBasketRepository, BasketRepository>();
 
             return services;
         }

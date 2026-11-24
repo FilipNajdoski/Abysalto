@@ -13,6 +13,8 @@ namespace AbySalto.Mid.Infrastructure.Persistence
         }
 
         public DbSet<Favorite> Favorites => Set<Favorite>();
+        public DbSet<Basket> Baskets => Set<Basket>();
+        public DbSet<BasketItem> BasketItems => Set<BasketItem>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
