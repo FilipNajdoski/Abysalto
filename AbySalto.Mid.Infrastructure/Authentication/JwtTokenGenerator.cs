@@ -1,17 +1,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using AbySalto.Mid.Infrastructure.Identity;
+using AbySalto.Mid.Application.Auth.Dtos;
+using AbySalto.Mid.Application.Common.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AbySalto.Mid.Infrastructure.Authentication
 {
-    public interface IJwtTokenGenerator
-    {
-        (string Token, DateTime ExpiresAt) Generate(ApplicationUser user);
-    }
-
     public sealed class JwtTokenGenerator : IJwtTokenGenerator
     {
         private readonly JwtOptions _options;
@@ -21,14 +17,14 @@ namespace AbySalto.Mid.Infrastructure.Authentication
             _options = options.Value;
         }
 
-        public (string Token, DateTime ExpiresAt) Generate(ApplicationUser user)
+        public AccessToken Generate(UserDto user)
         {
             var expiresAt = DateTime.UtcNow.AddMinutes(_options.ExpiryMinutes);
 
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -43,7 +39,7 @@ namespace AbySalto.Mid.Infrastructure.Authentication
                 expires: expiresAt,
                 signingCredentials: credentials);
 
-            return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
+            return new AccessToken(new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
         }
     }
 }

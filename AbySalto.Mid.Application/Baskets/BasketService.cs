@@ -10,12 +10,14 @@ namespace AbySalto.Mid.Application.Baskets
     {
         private readonly IBasketRepository _repository;
         private readonly IProductCatalog _catalog;
+        private readonly IProductLookup _productLookup;
         private readonly ICurrentUserService _currentUser;
 
-        public BasketService(IBasketRepository repository, IProductCatalog catalog, ICurrentUserService currentUser)
+        public BasketService(IBasketRepository repository, IProductCatalog catalog, IProductLookup productLookup, ICurrentUserService currentUser)
         {
             _repository = repository;
             _catalog = catalog;
+            _productLookup = productLookup;
             _currentUser = currentUser;
         }
 
@@ -90,31 +92,12 @@ namespace AbySalto.Mid.Application.Baskets
         {
             if (basket is null || basket.Items.Count == 0)
             {
-                return new BasketDto([], 0, 0m, basket?.UpdatedAt);
+                return BasketDtoMapper.Empty(basket?.UpdatedAt);
             }
 
-            var products = (await _catalog.GetAllAsync(cancellationToken)).ToDictionary(p => p.Id);
+            var products = await _productLookup.GetByIdsAsync(basket.Items.Select(i => i.ProductId), cancellationToken);
 
-            var items = basket.Items
-                .OrderBy(i => i.AddedAt)
-                .Select(i =>
-                {
-                    var product = products.GetValueOrDefault(i.ProductId);
-                    var unitPrice = product?.Price ?? 0m;
-
-                    return new BasketItemDto(
-                        i.ProductId,
-                        product?.Title ?? $"Product {i.ProductId}",
-                        product?.Thumbnail,
-                        unitPrice,
-                        i.Quantity,
-                        unitPrice * i.Quantity,
-                        i.AddedAt,
-                        product is not null);
-                })
-                .ToList();
-
-            return new BasketDto(items, items.Sum(i => i.Quantity), items.Sum(i => i.LineTotal), basket.UpdatedAt);
+            return BasketDtoMapper.ToDto(basket, products);
         }
     }
 }

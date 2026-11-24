@@ -9,12 +9,14 @@ namespace AbySalto.Mid.Application.Favorites
     {
         private readonly IFavoriteRepository _repository;
         private readonly IProductCatalog _catalog;
+        private readonly IProductLookup _productLookup;
         private readonly ICurrentUserService _currentUser;
 
-        public FavoriteService(IFavoriteRepository repository, IProductCatalog catalog, ICurrentUserService currentUser)
+        public FavoriteService(IFavoriteRepository repository, IProductCatalog catalog, IProductLookup productLookup, ICurrentUserService currentUser)
         {
             _repository = repository;
             _catalog = catalog;
+            _productLookup = productLookup;
             _currentUser = currentUser;
         }
 
@@ -22,7 +24,7 @@ namespace AbySalto.Mid.Application.Favorites
         {
             var userId = _currentUser.GetRequiredUserId();
             var favorites = await _repository.GetByUserAsync(userId, cancellationToken);
-            var products = (await _catalog.GetAllAsync(cancellationToken)).ToDictionary(p => p.Id);
+            var products = await _productLookup.GetByIdsAsync(favorites.Select(f => f.ProductId), cancellationToken);
 
             return favorites
                 .Select(f => new FavoriteDto(f.ProductId, f.CreatedAt, products.GetValueOrDefault(f.ProductId)))
