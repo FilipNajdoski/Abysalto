@@ -8,6 +8,7 @@ import ProfilePage from './pages/ProfilePage.jsx';
 import ProductDetailsPage from './pages/ProductDetailsPage.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
 import CartPage from './pages/CartPage.jsx';
+import CheckoutPage from './pages/CheckoutPage.jsx';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="favorites" element={<FavoritesPage />} />
           <Route path="cart" element={<CartPage />} />
+          <Route path="checkout" element={<CheckoutPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

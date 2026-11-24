@@ -114,6 +114,14 @@ export function ShopProvider({ children }) {
     [favoriteIds, requireAuth],
   );
 
+  const clearCart = useCallback(async () => {
+    let current = basket;
+    for (const item of basket.items) {
+      current = await shop.removeBasketItem(item.productId);
+    }
+    setBasket(current.items ? current : EMPTY_BASKET);
+  }, [basket]);
+
   const value = useMemo(
     () => ({
       basket,
@@ -124,10 +132,11 @@ export function ShopProvider({ children }) {
       addToCart,
       removeFromCart,
       updateQuantity,
+      clearCart,
       toggleFavorite,
       isFavorite: (id) => favoriteIds.has(id),
     }),
-    [basket, favoriteIds, cartOpen, addToCart, removeFromCart, updateQuantity, toggleFavorite],
+    [basket, favoriteIds, cartOpen, addToCart, removeFromCart, updateQuantity, clearCart, toggleFavorite],
   );
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

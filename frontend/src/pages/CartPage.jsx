@@ -53,9 +53,9 @@ export default function CartPage() {
             <strong>{formatPrice(basket.total)}</strong>
           </div>
           <p className="muted small">Taxes and shipping calculated at checkout.</p>
-          <button type="button" className="button full" disabled title="Checkout is out of scope">
+          <Link to="/checkout" className="button full">
             Checkout
-          </button>
+          </Link>
         </aside>
       </div>
     </div>
