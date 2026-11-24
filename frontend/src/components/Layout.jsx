@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useShop } from '../context/ShopContext.jsx';
 import CartDrawer from './CartDrawer.jsx';
+import BackToTop from './BackToTop.jsx';
 import { BagIcon, HeartIcon } from './Icons.jsx';
 
 export default function Layout() {
@@ -53,6 +54,7 @@ export default function Layout() {
 	  </main>
 	  <footer className="site-footer muted small">© {new Date().getFullYear()} AbySalto Shop</footer>
 	  <CartDrawer />
+			<BackToTop />
 	</div>
   );
 }
