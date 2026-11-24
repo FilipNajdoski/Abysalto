@@ -26,8 +26,8 @@ namespace AbySalto.Mid
                 app.UseSwagger();
                 app.UseSwaggerUI(options =>
                 {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Desk Link");
-                    options.RoutePrefix = string.Empty;
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "AbySalto");
+                    options.RoutePrefix = "swagger";
                 });
             }
 
