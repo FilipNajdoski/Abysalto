@@ -5,6 +5,9 @@ import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import ProductDetailsPage from './pages/ProductDetailsPage.jsx';
+import FavoritesPage from './pages/FavoritesPage.jsx';
+import CartPage from './pages/CartPage.jsx';
 
 export default function App() {
   return (
@@ -13,8 +16,11 @@ export default function App() {
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="products/:id" element={<ProductDetailsPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="favorites" element={<FavoritesPage />} />
+          <Route path="cart" element={<CartPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
