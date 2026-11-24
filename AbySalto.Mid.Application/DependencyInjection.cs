@@ -1,4 +1,5 @@
-﻿using AbySalto.Mid.Application.Products;
+﻿using AbySalto.Mid.Application.Favorites;
+using AbySalto.Mid.Application.Products;
 using Microsoft.Extensions.DependencyInjection;
 namespace AbySalto.Mid.Application
 {
@@ -7,6 +8,7 @@ namespace AbySalto.Mid.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IFavoriteService, FavoriteService>();
 
             return services;
         }
