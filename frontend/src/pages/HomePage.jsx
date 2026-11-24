@@ -13,12 +13,15 @@ const SORT_OPTIONS = [
   { value: 'discountPercentage:desc', label: 'Biggest discount' },
   { value: 'title:asc', label: 'Alphabetical' },
 ];
-const PAGE_SIZE = 12;
+const DEFAULT_PAGE_SIZE = 12;
+const PAGE_SIZE_OPTIONS = [12, 24, 48, 96];
 
 export default function HomePage() {
   const [params, setParams] = useSearchParams();
   const page = Number(params.get('page')) || 1;
   const sort = params.get('sort') || '';
+  const requestedSize = Number(params.get('pageSize'));
+  const pageSize = PAGE_SIZE_OPTIONS.includes(requestedSize) ? requestedSize : DEFAULT_PAGE_SIZE;
   const search = params.get('q') || '';
   const category = params.get('category') || '';
   const [categories, setCategories] = useState([]);
@@ -39,7 +42,7 @@ export default function HomePage() {
 	setError('');
 	getProducts({
 	  page,
-	  pageSize: PAGE_SIZE,
+	  pageSize,
 	  sortBy: sortBy || undefined,
 	  order,
 	  search: search || undefined,
@@ -48,7 +51,7 @@ export default function HomePage() {
 	  .then(setResult)
 	  .catch((err) => setError(getErrorMessage(err)))
 	  .finally(() => setLoading(false));
-  }, [page, sort, search, category]);
+  }, [page, pageSize, sort, search, category]);
 
   const update = (changes) => {
 	const next = new URLSearchParams(params);
@@ -95,6 +98,16 @@ export default function HomePage() {
 		  <select value={sort} onChange={(e) => update({ sort: e.target.value, page: '' })} aria-label="Sort by">
 			{SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
 		  </select>
+		  <select
+			value={pageSize}
+			onChange={(e) => {
+			  const size = Number(e.target.value);
+			  update({ pageSize: size === DEFAULT_PAGE_SIZE ? '' : String(size), page: '' });
+			}}
+			aria-label="Products per page"
+		  >
+			{PAGE_SIZE_OPTIONS.map((n) => <option key={n} value={n}>{n} per page</option>)}
+		  </select>
 		</div>
 	  </div>
 
@@ -102,7 +115,7 @@ export default function HomePage() {
 
 	  {loading ? (
 		<div className="product-grid">
-		  {Array.from({ length: PAGE_SIZE }).map((_, i) => <div key={i} className="skeleton" />)}
+		  {Array.from({ length: pageSize }).map((_, i) => <div key={i} className="skeleton" />)}
 		</div>
 	  ) : result?.items.length === 0 ? (
 		<p className="empty">No products match your filters.</p>
