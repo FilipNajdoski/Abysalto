@@ -25,6 +25,18 @@ namespace AbySalto.Mid.Application.Products
             _catalog = catalog;
         }
 
+        public async Task<IReadOnlyList<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default)
+        {
+            var products = await _catalog.GetAllAsync(cancellationToken);
+
+            return products
+                .Where(p => !string.IsNullOrWhiteSpace(p.Category))
+                .GroupBy(p => p.Category, StringComparer.OrdinalIgnoreCase)
+                .Select(g => new CategoryDto(g.Key, g.Count()))
+                .OrderBy(c => c.Slug, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
         public async Task<PagedResult<ProductDto>> GetProductsAsync(ProductQuery query, CancellationToken cancellationToken = default)
         {
             IEnumerable<ProductDto> products = await _catalog.GetAllAsync(cancellationToken);

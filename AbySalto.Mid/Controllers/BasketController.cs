@@ -33,6 +33,15 @@ namespace AbySalto.Mid.Controllers
             return Ok(await _basketService.AddItemAsync(request, cancellationToken));
         }
 
+        [HttpPut("items/{productId:int}")]
+        [ProducesResponseType(typeof(BasketDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<BasketDto>> SetItemQuantity(int productId, SetBasketItemQuantityRequest request, CancellationToken cancellationToken)
+        {
+            return Ok(await _basketService.SetItemQuantityAsync(productId, request, cancellationToken));
+        }
+
         [HttpDelete("items/{productId:int}")]
         [ProducesResponseType(typeof(BasketDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

@@ -3,7 +3,7 @@ import { useShop } from '../context/ShopContext.jsx';
 import { formatPrice } from '../utils/format.js';
 
 export default function CartPage() {
-  const { basket, addToCart, removeFromCart } = useShop();
+  const { basket, updateQuantity, removeFromCart } = useShop();
 
   if (basket.items.length === 0) {
     return (
@@ -29,10 +29,13 @@ export default function CartPage() {
                   <Link to={`/products/${item.productId}`} className="cart-title">{item.title}</Link>
                   <span className="muted small">{formatPrice(item.unitPrice)} each</span>
                   <div className="qty small">
-                    <button type="button" onClick={() => removeFromCart(item.productId)} aria-label="Remove item">🗑</button>
+                    <button type="button" onClick={() => updateQuantity(item.productId, item.quantity - 1)} aria-label="Decrease quantity">−</button>
                     <span>{item.quantity}</span>
-                    <button type="button" onClick={() => addToCart(item.productId, 1)} aria-label="Add one more">+</button>
+                    <button type="button" onClick={() => updateQuantity(item.productId, item.quantity + 1)} aria-label="Increase quantity">+</button>
                   </div>
+                  <button type="button" className="link-button danger small" onClick={() => removeFromCart(item.productId)}>
+                    Remove
+                  </button>
                 </div>
                 <strong>{formatPrice(item.lineTotal)}</strong>
               </li>

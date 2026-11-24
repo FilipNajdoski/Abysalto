@@ -34,6 +34,16 @@ export async function addBasketItem(productId, quantity = 1) {
   return data;
 }
 
+export async function getCategories() {
+  const { data } = await client.get('/products/categories');
+  return data;
+}
+
+export async function setBasketItemQuantity(productId, quantity) {
+  const { data } = await client.put(`/basket/items/${productId}`, { quantity });
+  return data;
+}
+
 export async function removeBasketItem(productId) {
   const { data } = await client.delete(`/basket/items/${productId}`);
   return data;

@@ -52,6 +52,25 @@ namespace AbySalto.Mid.Application.Baskets
             return await ToDtoAsync(basket, cancellationToken);
         }
 
+        public async Task<BasketDto> SetItemQuantityAsync(int productId, SetBasketItemQuantityRequest request, CancellationToken cancellationToken = default)
+        {
+            var userId = _currentUser.GetRequiredUserId();
+
+            var basket = await _repository.GetByUserAsync(userId, cancellationToken);
+            if (basket is null || basket.GetQuantity(productId) == 0)
+            {
+                throw new NotFoundException($"Product {productId} is not in the basket.");
+            }
+
+            var product = await _catalog.GetByIdAsync(productId, cancellationToken)
+                ?? throw new NotFoundException($"Product with id {productId} was not found.");
+
+            basket.SetItemQuantity(productId, request.Quantity, product.Stock);
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            return await ToDtoAsync(basket, cancellationToken);
+        }
+
         public async Task<BasketDto> RemoveItemAsync(int productId, CancellationToken cancellationToken = default)
         {
             var userId = _currentUser.GetRequiredUserId();

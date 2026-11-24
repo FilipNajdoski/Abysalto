@@ -24,6 +24,13 @@ namespace AbySalto.Mid.Controllers
             return Ok(await _productService.GetProductsAsync(query, cancellationToken));
         }
 
+        [HttpGet("categories")]
+        [ProducesResponseType(typeof(IReadOnlyList<CategoryDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IReadOnlyList<CategoryDto>>> GetCategories(CancellationToken cancellationToken)
+        {
+            return Ok(await _productService.GetCategoriesAsync(cancellationToken));
+        }
+
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

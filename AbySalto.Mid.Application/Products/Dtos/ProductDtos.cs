@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AbySalto.Mid.Application.Products.Dtos
 {
+    public sealed record CategoryDto(string Slug, int ProductCount);
+
     public sealed record ProductReviewDto(int Rating, string Comment, DateTime Date, string ReviewerName);
 
     public sealed record ProductDto(

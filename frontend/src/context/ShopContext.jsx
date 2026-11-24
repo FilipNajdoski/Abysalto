@@ -3,9 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import { getErrorMessage } from '../api/client.js';
 import * as shop from '../api/shop.js';
+import { notify } from '../utils/notify.js';
 
 const ShopContext = createContext(null);
 const EMPTY_BASKET = { items: [], totalQuantity: 0, total: 0, updatedAt: null };
+
+const titleOf = (basket, productId) =>
+  basket.items.find((i) => i.productId === productId)?.title ?? 'Product';
 
 export function ShopProvider({ children }) {
   const { isAuthenticated } = useAuth();
@@ -13,17 +17,6 @@ export function ShopProvider({ children }) {
   const [basket, setBasket] = useState(EMPTY_BASKET);
   const [favoriteIds, setFavoriteIds] = useState(() => new Set());
   const [cartOpen, setCartOpen] = useState(false);
-  const [toast, setToast] = useState(null);
-
-  const notify = useCallback((message, tone = 'info') => {
-    setToast({ message, tone, id: Date.now() });
-  }, []);
-
-  useEffect(() => {
-    if (!toast) return undefined;
-    const timer = setTimeout(() => setToast(null), 3000);
-    return () => clearTimeout(timer);
-  }, [toast]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -40,6 +33,7 @@ export function ShopProvider({ children }) {
 
   const requireAuth = useCallback(() => {
     if (isAuthenticated) return true;
+    notify.info('Please log in to continue.');
     navigate('/login');
     return false;
   }, [isAuthenticated, navigate]);
@@ -48,24 +42,51 @@ export function ShopProvider({ children }) {
     async (productId, quantity = 1) => {
       if (!requireAuth()) return;
       try {
-        setBasket(await shop.addBasketItem(productId, quantity));
+        const updated = await shop.addBasketItem(productId, quantity);
+        setBasket(updated);
         setCartOpen(true);
+        notify.success(`${titleOf(updated, productId)} added to cart`);
       } catch (error) {
-        notify(getErrorMessage(error), 'error');
+        notify.error(getErrorMessage(error));
       }
     },
-    [requireAuth, notify],
+    [requireAuth],
   );
 
   const removeFromCart = useCallback(
     async (productId) => {
+      const title = titleOf(basket, productId);
       try {
         setBasket(await shop.removeBasketItem(productId));
+        notify.info(`${title} removed from cart`);
       } catch (error) {
-        notify(getErrorMessage(error), 'error');
+        notify.error(getErrorMessage(error));
       }
     },
-    [notify],
+    [basket],
+  );
+
+  const updateQuantity = useCallback(
+    async (productId, quantity) => {
+      if (quantity <= 0) {
+        await removeFromCart(productId);
+        return;
+      }
+      const previous = basket.items.find((i) => i.productId === productId)?.quantity ?? 0;
+      try {
+        const updated = await shop.setBasketItemQuantity(productId, quantity);
+        setBasket(updated);
+        const title = titleOf(updated, productId);
+        notify.success(
+          quantity > previous
+            ? `Increased ${title} to ${quantity}`
+            : `Decreased ${title} to ${quantity}`,
+        );
+      } catch (error) {
+        notify.error(getErrorMessage(error));
+      }
+    },
+    [basket, removeFromCart],
   );
 
   const toggleFavorite = useCallback(
@@ -84,12 +105,13 @@ export function ShopProvider({ children }) {
           else next.add(productId);
           return next;
         });
-        notify(isFavorite ? 'Removed from favorites' : 'Saved to favorites');
+        if (isFavorite) notify.info('Removed from favorites');
+        else notify.success('Saved to favorites');
       } catch (error) {
-        notify(getErrorMessage(error), 'error');
+        notify.error(getErrorMessage(error));
       }
     },
-    [favoriteIds, requireAuth, notify],
+    [favoriteIds, requireAuth],
   );
 
   const value = useMemo(
@@ -97,15 +119,15 @@ export function ShopProvider({ children }) {
       basket,
       favoriteIds,
       cartOpen,
-      toast,
       openCart: () => setCartOpen(true),
       closeCart: () => setCartOpen(false),
       addToCart,
       removeFromCart,
+      updateQuantity,
       toggleFavorite,
       isFavorite: (id) => favoriteIds.has(id),
     }),
-    [basket, favoriteIds, cartOpen, toast, addToCart, removeFromCart, toggleFavorite],
+    [basket, favoriteIds, cartOpen, addToCart, removeFromCart, updateQuantity, toggleFavorite],
   );
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

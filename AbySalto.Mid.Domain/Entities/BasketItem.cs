@@ -36,6 +36,12 @@ namespace AbySalto.Mid.Domain.Entities
             Quantity += quantity;
         }
 
+        internal void SetQuantity(int quantity)
+        {
+            EnsurePositive(quantity);
+            Quantity = quantity;
+        }
+
         private static void EnsurePositive(int quantity)
         {
             if (quantity <= 0)

@@ -6,7 +6,7 @@ import { BagIcon, HeartIcon } from './Icons.jsx';
 
 export default function Layout() {
   const { user, isAuthenticated, logout } = useAuth();
-  const { basket, openCart, toast } = useShop();
+  const { basket, openCart } = useShop();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -53,7 +53,6 @@ export default function Layout() {
 	  </main>
 	  <footer className="site-footer muted small">© {new Date().getFullYear()} AbySalto Shop</footer>
 	  <CartDrawer />
-	  {toast && <div key={toast.id} className={`toast ${toast.tone}`}>{toast.message}</div>}
 	</div>
   );
 }

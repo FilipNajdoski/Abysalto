@@ -11,6 +11,12 @@ namespace AbySalto.Mid.Application.Baskets.Dtos
         public int Quantity { get; init; } = 1;
     }
 
+    public sealed class SetBasketItemQuantityRequest
+    {
+        [Range(1, 100)]
+        public int Quantity { get; init; }
+    }
+
     public sealed record BasketItemDto(
         int ProductId,
         string Title,

@@ -3,7 +3,7 @@ import { useShop } from '../context/ShopContext.jsx';
 import { formatPrice } from '../utils/format.js';
 
 export default function CartDrawer() {
-  const { basket, cartOpen, closeCart, removeFromCart } = useShop();
+  const { basket, cartOpen, closeCart, removeFromCart, updateQuantity } = useShop();
 
   return (
     <>
@@ -26,7 +26,12 @@ export default function CartDrawer() {
                   <img src={item.thumbnail} alt={item.title} />
                   <div>
                     <Link to={`/products/${item.productId}`} onClick={closeCart} className="cart-title">{item.title}</Link>
-                    <span className="muted small">{item.quantity} × {formatPrice(item.unitPrice)}</span>
+                    <span className="muted small">{formatPrice(item.unitPrice)} each</span>
+                    <div className="qty small">
+                      <button type="button" onClick={() => updateQuantity(item.productId, item.quantity - 1)} aria-label="Decrease quantity">−</button>
+                      <span>{item.quantity}</span>
+                      <button type="button" onClick={() => updateQuantity(item.productId, item.quantity + 1)} aria-label="Increase quantity">+</button>
+                    </div>
                     <button type="button" className="link-button danger small" onClick={() => removeFromCart(item.productId)}>
                       Remove
                     </button>
